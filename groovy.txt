@@ -1,71 +1,71 @@
 job("DevOpsTask6Job1"){
   description("This is first job of groovy project")
-        scm {
-                github('chiragnagar1/DevOps-GroovyJob-task','master')
-        }
-
-        triggers {
-                scm("* * * * *")
-        }
+	scm {
+		github('chiragnagar1/DevOps-GroovyJob-task','master')
+	}
+     		
+	triggers {
+		scm("* * * * *")
+	}
      steps {
         shell('''
-sudo mkdir -p /root/DevOpsTask6
-sudo cp -rvf * /root/DevOpsTask6
-                ''')
+        sudo mkdir -p  /DevOpsTask6
+        sudo cp -rvf * /DevOpsTask6
+		''')
     }
 }
 job("DevOpsTask6Job2"){
   description("This is second job of groovy project")
-        triggers {
+	triggers {
         upstream('DevOpsTask6Job1', 'SUCCESS')
     }
      steps {
         shell('''
-                cd /root/DevOpsTask6
-                if ls | grep .html
-                then
-                if sudo kubectl get pods | grep html-deploy
-                then
-                echo "Already Running"
-                else
-                sudo kubectl delete all --all
-                sudo kubectl run html-pod --image=httpd
-                sleep 30
-                sudo kubectl cp *.html  html-pod:/usr/local/apache2/htdocs
-                sudo kubectl expose pods html-pod --type=NodePort --port=80
-                fi
-                elif ls| grep .php
-                then
-                if sudo kubectl get pods | grep php-deploy
-                then
-                echo "Already Running"
-                else
-                sudo kubectl delete all --all
-                sudo kubectl run php-pod --image=php:latest
-                sleep 30
-                sudo kubectl cp * php-pod:/usr/src/myapp
-                sudo kubectl expose pod php-pod --type=NodePort --port=80
-                fi
-                fi
-                ''')
+		cd /DevOpsTask6
+		if ls | grep .html
+		then
+		if sudo kubectl get pods | grep htmldeployment
+		then
+		echo "Already Running"
+		else
+		sudo kubectl delete all --all
+		sudo kubectl run htmlpod --image=httpd
+		sleep 30
+		sudo kubectl web.html  htmlpod:/usr/local/apache2/htdocs
+		sudo kubectl expose pods htmlpod --type=NodePort --port=80
+		fi
+		elif ls| grep .php
+		then
+		if sudo kubectl get pods | grep phpdeployment
+		then
+		echo "Already Running"
+		else
+		sudo kubectl delete all --all
+		sudo kubectl run phppod --image=php:latest
+		sleep 30
+		sudo kubectl cp web.php php-pod:/usr/src/myapp
+		sudo kubectl expose pod php-pod --type=NodePort --port=80
+		fi
+		fi
+		''')
     }
 }
 job("DevOpsTask6Job3")
 {
-        description("This is third job of groovy project")
-        triggers {
+	description("This is third job of groovy project")
+	triggers {
         upstream('DevOpsTask6Job2', 'SUCCESS')
     }
-         steps {
+	 steps {
         shell('''
-                website_status=$(curl -o /dev/null -s -w "%{http_code}\n" http://192.168.43.34:30000)
-               if [[ "$website_status" -eq 200 ]]
-               then
-                   :
-               else
-                  exit 1
-               fi
-        ''')
+website_status=$(curl -o /dev/null -s -w "%{http_code}\n" http://192.168.43.34:30000)
+if [[ "$website_status" -eq 200 ]]
+then
+    :
+else
+exit 1
+fi
+	''')
       }
 }
 
@@ -78,4 +78,3 @@ buildPipelineView('Groovy project') {
     alwaysAllowManualTrigger()
     showPipelineParameters()
     refreshFrequency(30)
-}
